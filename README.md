@@ -35,9 +35,9 @@ drunkdeer -h
 ## Config File structure
 ### This entry is for myself and the more advanced users
 ### The config file is a JSON file that contains the following structure:
-<!-- <p>List of character names can be found in [this file](https://github.com/2xxn/cli-drunkdeer/pkg/consts.go)</p> -->
-<p>Actuation point should be between 0.1mm and 3.9mm (although both are unadvised, you should do 0.2mm at lowest)</p>
-
+List of character names and color sequences can be found in [this file](https://github.com/2xxn/cli-drunkdeer/blob/main/driver/consts.go)<br>
+Actuation point should be between 0.1mm and 3.9mm (although both are unadvised, you should do 0.2mm at lowest)
+#### Speed and brightness must be between 0 and 9 (where 9 is max)
 ```json
 {
     "model": "A75",
