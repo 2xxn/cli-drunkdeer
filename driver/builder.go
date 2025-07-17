@@ -1,12 +1,14 @@
 package driver
 
 func BuildIdentity() []byte {
-	report := []byte{PACKET_IDENTITY, 0x02}
-	return report
+	return []byte{
+		PACKET_IDENTITY,
+		0x02,
+	}
 }
 
 func BuildLEDModeSelect(direction, sequence, speed, brightness, rgb byte) []byte {
-	report := []byte{
+	return []byte{
 		PACKET_LEDMODESEL,
 		0x01,
 		0x00,
@@ -16,8 +18,6 @@ func BuildLEDModeSelect(direction, sequence, speed, brightness, rgb byte) []byte
 		brightness,
 		rgb,
 	}
-
-	return report
 }
 
 func BuildLEDModeSelectTurbo(direction, sequence, speed, brightness, rgb byte) []byte {
@@ -28,29 +28,25 @@ func BuildLEDModeSelectTurbo(direction, sequence, speed, brightness, rgb byte) [
 }
 
 func BuildRapidTriggerTurbo(rt, turbo bool) []byte {
-	report := make([]byte, 63)
-	report[0] = PACKET_TURBORT
-	report[1] = 0x00
-	report[2] = 0x1E
-	report[3] = 0x01
-	report[4] = 0x00
-	report[5] = 0x00
-	report[6] = 0x01
-	report[7] = BoolToByte(turbo)
-	report[8] = BoolToByte(rt)
-
-	return report
+	return []byte{
+		PACKET_TURBORT,
+		0x00,
+		0x1E,
+		0x01,
+		0x00,
+		0x00,
+		0x01,
+		BoolToByte(turbo),
+		BoolToByte(rt),
+	}
 }
 
 func BuildKeyTracking(track bool) []byte {
-	report := make([]byte, 63)
-	report[0] = PACKET_MODIFYKEY
-	report[1] = 0x03
-	if track {
-		report[2] = 0x01
+	return []byte{
+		PACKET_MODIFYKEY,
+		0x03,
+		BoolToByte(track),
 	}
-
-	return report
 }
 
 // func BuildLEDModeSelectCustomLight(direction, sequence, speed, brightness, rgb byte, ) []byte {

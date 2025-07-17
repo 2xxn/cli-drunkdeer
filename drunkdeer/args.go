@@ -14,7 +14,7 @@ import (
 func (a *App) handleArgs() {
 	if a.args.Debug {
 		debug = true
-		debugPrintf("DEBUG ENABLED")
+		DEBUG("DEBUG ENABLED")
 	}
 
 	switch a.args.Command {

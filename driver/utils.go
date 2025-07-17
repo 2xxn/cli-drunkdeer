@@ -1,12 +1,15 @@
 package driver
 
-import "bytes"
+import (
+	"bytes"
+	"slices"
+)
 
 func BoolToByte(b bool) byte {
 	if b {
-		return 1
+		return 0x01
 	}
-	return 0
+	return 0x00
 }
 
 func DetectKeyboardModel(modelBytes []byte) (string, int) { // Model and type
@@ -74,26 +77,18 @@ func GetKeyByIndex(index int) string {
 }
 
 func GetIndexByKey(key string) int {
-	for i, v := range KEYBOARD_LAYOUT {
-		if v == key {
-			return i
-		}
-	}
-	return -1
+	return slices.Index(KEYBOARD_LAYOUT, key)
 }
 
 func GetRowByIndex(index int) int {
-	if index >= 0 && index < len(KEYBOARD_LAYOUT) {
-		return index / KEYS_PER_ROW
-	}
-	return -1
+	return index / KEYS_PER_ROW
 }
 
 func ActuationFloatToByte(actuation float32) byte {
 	var normalized int = int(actuation * 10)
 	if normalized < 0 {
 		normalized = 1
-	} // can't afford values this low
+	} // maniacs
 
 	if normalized > 255 {
 		normalized = 255

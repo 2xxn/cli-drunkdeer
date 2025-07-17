@@ -3,34 +3,11 @@ package driver
 import (
 	"bytes"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/sstallion/go-hid"
 )
-
-type DrunkDeerController struct {
-	device   *hid.Device
-	identity *DDKeyboardIdentity
-
-	actuations  []byte
-	downstrokes []byte
-	upstrokes   []byte
-
-	turbo        bool
-	rapidTrigger bool
-	debug        bool
-
-	wg          sync.WaitGroup
-	packetChan  chan DDPacket
-	packetQueue chan []byte
-
-	Light *DDLight
-
-	shouldClose bool
-	closeOnce   sync.Once
-}
 
 func (d *DrunkDeerController) GetIdentity() *DDKeyboardIdentity {
 	if d.identity == nil {
@@ -79,48 +56,6 @@ func (d *DrunkDeerController) Log(str string, v ...interface{}) {
 		fmt.Printf(color.HiGreenString("[DEBUG] ")+str, v...)
 	}
 }
-
-// #region Packet senders
-func (d *DrunkDeerController) SendIdentity() {
-	report := BuildIdentity()
-	d.QueuePacket(report)
-}
-
-func (d *DrunkDeerController) SendLEDModeSelect(direction, sequence, speed, brightness, rgb byte) {
-	report := BuildLEDModeSelect(direction, sequence, speed, brightness, rgb)
-	d.QueuePacket(report)
-}
-
-func (d *DrunkDeerController) SendLEDModeSelectTurbo(direction, sequence, speed, brightness, rgb byte) {
-	report := BuildLEDModeSelectTurbo(direction, sequence, speed, brightness, rgb)
-	d.QueuePacket(report)
-}
-
-func (d *DrunkDeerController) SendModifyRow(row uint8, keys []byte) {
-	report := BuildModifyRowActuation(row, keys)
-	d.QueuePacket(report)
-}
-
-func (d *DrunkDeerController) SendRapidTriggerTurbo(rt, turbo bool) {
-	report := BuildRapidTriggerTurbo(rt, turbo)
-	d.QueuePacket(report)
-}
-
-func (d *DrunkDeerController) SendDownstrokes(row uint8, keys []byte) {
-	report := BuildModifyRowDownstroke(row, keys)
-	d.QueuePacket(report)
-}
-
-func (d *DrunkDeerController) SendUpstrokes(row uint8, keys []byte) {
-	report := BuildModifyRowUpstroke(row, keys)
-	d.QueuePacket(report)
-}
-
-func (d *DrunkDeerController) QueuePacket(p []byte) {
-	d.packetQueue <- p
-}
-
-// #endregion
 
 func (d *DrunkDeerController) LoadActuations(actuations []byte) {
 	if len(actuations) != len(KEYBOARD_LAYOUT) {
@@ -362,7 +297,7 @@ func (d *DrunkDeerController) drunkDeerMessageReceiver() {
 
 			versionBytes := data.Next(2)
 			model, keyboardType := DetectKeyboardModel(modelBytes)
-			version := int(versionBytes[0] | versionBytes[1]<<8)
+			version := int(uint16(versionBytes[0]) | uint16(versionBytes[1])<<8)
 			ident := DDKeyboardIdentity{
 				KeyboardModel:   model,
 				KeyboardType:    uint8(keyboardType),
@@ -371,29 +306,21 @@ func (d *DrunkDeerController) drunkDeerMessageReceiver() {
 				Turbo:           p.Data[14] != 0,
 			}
 			d.identity = &ident
-			break
 		case PACKET_LEDMODESEL:
 			d.Light.Direction = p.Data[2]
 			d.Light.Sequence = p.Data[3]
 			d.Light.Speed = p.Data[4]
 			d.Light.Brightness = p.Data[5]
-
-			break
 		case PACKET_TURBORT:
 			d.Log("Turbo packet received: %x", p.Data)
 			d.turbo = p.Data[6] != 0
 			d.rapidTrigger = p.Data[7] != 0
-			break
 		case PACKET_MODIFYKEY:
 			d.Log("Modify key packet received: %x", p.Data)
-			break
 		case PACKET_KEYTRACKING:
-
-			break
 		default:
 			d.Log("Unknown packet type: %x", p.Packet)
 			d.Log("Data: %x", p.Data)
-			break
 		}
 	}
 }

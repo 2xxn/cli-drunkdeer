@@ -14,6 +14,18 @@ import (
 	"github.com/sstallion/go-hid"
 )
 
+func DEBUG(format string, v ...any) {
+	if !debug {
+		return
+	}
+
+	if format[len(format)-1] != '\n' {
+		format += "\n"
+	}
+	debugPrefix := color.HiGreenString("[DEBUG] ")
+	fmt.Printf(debugPrefix+format, v...)
+}
+
 func copyFile(src, dst string) error {
 	source, err := os.Open(src)
 	if err != nil {
@@ -87,7 +99,7 @@ func grabDeviceIdentity(deviceInfo *hid.DeviceInfo) (*driver.DDKeyboardIdentity,
 }
 
 func (a *App) getConfig(loadPath string) *Config {
-	debugPrintf("Loading profile from %s", loadPath)
+	DEBUG("Loading profile from %s", loadPath)
 
 	var config Config
 	var data []byte
