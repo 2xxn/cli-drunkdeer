@@ -2,12 +2,14 @@
 This CLI is a custom driver for the DrunkDeer keyboard. It allows you to configure the keyboard's settings, including actuation points, light settings, turbo mode and rapid trigger.
 
 ## Reason for this project
-This project was created out of frustration, DrunkDeer webdriver's servers are so awful that getting into the WebDriver can sometimes take up to 10 minutes (especially uncached, I have tendencies to reload using CTRL+SHIFT+R). This project is a workaround for that, it allows you to configure the keyboard without the need for the web driver.
+This project was created out of frustration, DrunkDeer webdriver's servers are so awful that getting into the WebDriver can sometimes take up to 10 minutes (especially uncached, I have tendencies to reload using CTRL+SHIFT+R). This project is a workaround for that, it allows you to configure the keyboard without the need for the web driver, additionally "preventing" DrunkDeer from exit-scamming.
 
 ## REMAPPING IS NOT SUPPORTED YET
 
 ## Installation
+### You will need gcc before installing and CGO_ENABLED=1
 ```bash
+set CGO_ENABLED=1
 go install github.com/2xxn/cli-drunkdeer/drunkdeer@latest
 ```
 
