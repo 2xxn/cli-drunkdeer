@@ -17,6 +17,8 @@ func main() {
 	hid.Init()
 	defer hid.Exit()
 
+	configureOpenMode()
+
 	app := &App{profilePath: defaultProfilePath}
 
 	app.parseArgs()
